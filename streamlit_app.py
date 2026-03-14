@@ -182,7 +182,7 @@ def ShowAll() -> None:
 
     people = db.query(sql, params)
     st.button('Back', on_click=lambda: setattr(st.session_state,'Mode', StreamlitMode.NameInputStandard))
-    st.dataframe(people, hide_index=False)
+    st.dataframe(people, hide_index=True)
 
 def ShowSubmitButton() -> None:
     st.button('Submit', on_click=Submit)
