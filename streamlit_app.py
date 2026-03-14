@@ -19,7 +19,7 @@ class StreamlitMode:
 
 def ShowDate() -> None:
     st.session_state.setdefault('selectedDate', date.today())
-    left, right = st.columns([4, 1], vertical_alignment='bottom')
+    left, right = st.columns([2, 1], vertical_alignment='bottom')
     with left:
         st.date_input('Date', label_visibility='visible', format='DD/MM/YYYY', key='selectedDate')
     with right:
