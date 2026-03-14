@@ -85,7 +85,7 @@ def ShowNewPersonell() -> None:
     with right:
         st.button('Add', use_container_width=True, on_click=AddNewPersonell)
     if len(st.session_state.newPersonell) > 0:
-        st.dataframe(st.session_state.newPersonell)
+        st.dataframe(st.session_state.newPersonell, hide_index=True)
 
 def AddNewCompany() -> None:
     sql = "INSERT INTO entities (entity_type) VALUES ('Company') RETURNING entity_id"
@@ -182,7 +182,7 @@ def ShowAll() -> None:
 
     people = db.query(sql, params)
     st.button('Back', on_click=lambda: setattr(st.session_state,'Mode', StreamlitMode.NameInputStandard))
-    st.dataframe(people)
+    st.dataframe(people, hide_index=False)
 
 def ShowSubmitButton() -> None:
     st.button('Submit', on_click=Submit)
