@@ -5,7 +5,7 @@ if TYPE_CHECKING:
 
 import streamlit as st
 from sqlalchemy import text
-from database import Database
+from .database import Database
 from datetime import date
 
 @st.cache_resource
@@ -76,7 +76,8 @@ def ShowNewPersonell() -> None:
         st.text_input('Last Name', label_visibility='visible', key='lastName')
     with right:
         st.button('Add', use_container_width=True, on_click=AddNewPersonell)
-    st.dataframe(st.session_state.newPersonell)
+    if len(st.session_state.newPersonell) > 0:
+        st.dataframe(st.session_state.newPersonell)
 
 def AddNewCompany() -> None:
     sql = "INSERT INTO entities (entity_type) VALUES ('Company') RETURNING entity_id"
