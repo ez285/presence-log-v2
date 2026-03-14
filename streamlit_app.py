@@ -5,7 +5,7 @@ if TYPE_CHECKING:
 
 import streamlit as st
 from sqlalchemy import text
-from .database import Database
+from database import Database
 from datetime import date
 
 @st.cache_resource
