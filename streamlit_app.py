@@ -31,34 +31,37 @@ def ShowCompany() -> None:
     st.selectbox('Company name', company_names + ['Add New'], label_visibility='visible', key = 'selectedCompany')
 
 def ShowExistingPersonell() -> None:
-    sql = (
-        "WITH "
-            "people AS (SELECT entity_id FROM entities WHERE entity_type = 'Person'), "
-            "company AS (SELECT entity_id FROM entities WHERE entity_type = 'Company'), "
-            "selectedCompany AS (SELECT company.entity_id FROM company "
-                "LEFT JOIN properties ON company.entity_id = properties.entity_id "
-                "WHERE property_name = 'Name' AND property_value = :selectedCompany), "
-            "selectedCompanyPersonellIDS AS (SELECT people.entity_id FROM people "
-                "LEFT JOIN properties ON people.entity_id = properties.entity_id "
-                "WHERE property_name = 'Company' AND property_value::INTEGER = (SELECT entity_id FROM selectedCompany)), "
-            "selectedCompanyPersonellNames AS (SELECT scp.entity_id, property_name,property_value FROM selectedCompanyPersonellIDS AS scp "
-                "LEFT JOIN properties ON scp.entity_id = properties.entity_id "
-                "WHERE property_name = 'First Name' OR property_name = 'Last Name') "
-        "SELECT entity_id, "
-            "MAX(CASE WHEN property_name = 'First Name' THEN property_value END) AS \"first_name\", "
-            "MAX(CASE WHEN property_name = 'Last Name' THEN property_value END) AS \"last_name\" "
-            "FROM selectedCompanyPersonellNames "
-            "GROUP BY entity_id"
-    )
-    params = {'selectedCompany': st.session_state.selectedCompany.split('|')[1].strip()}
-    st.session_state.existingPersonell = db.query(sql, params)
+    company_name = st.session_state.selectedCompany.split('|')[1].strip()
+    if st.session_state.lastQueriedCompanyPersonnel != company_name or len(st.session_state.existingPersonell) == 0:
+        sql = (
+            "WITH "
+                "people AS (SELECT entity_id FROM entities WHERE entity_type = 'Person'), "
+                "company AS (SELECT entity_id FROM entities WHERE entity_type = 'Company'), "
+                "selectedCompany AS (SELECT company.entity_id FROM company "
+                    "LEFT JOIN properties ON company.entity_id = properties.entity_id "
+                    "WHERE property_name = 'Name' AND property_value = :selectedCompany), "
+                "selectedCompanyPersonellIDS AS (SELECT people.entity_id FROM people "
+                    "LEFT JOIN properties ON people.entity_id = properties.entity_id "
+                    "WHERE property_name = 'Company' AND property_value::INTEGER = (SELECT entity_id FROM selectedCompany)), "
+                "selectedCompanyPersonellNames AS (SELECT scp.entity_id, property_name,property_value FROM selectedCompanyPersonellIDS AS scp "
+                    "LEFT JOIN properties ON scp.entity_id = properties.entity_id "
+                    "WHERE property_name = 'First Name' OR property_name = 'Last Name') "
+            "SELECT entity_id, "
+                "MAX(CASE WHEN property_name = 'First Name' THEN property_value END) AS \"first_name\", "
+                "MAX(CASE WHEN property_name = 'Last Name' THEN property_value END) AS \"last_name\" "
+                "FROM selectedCompanyPersonellNames "
+                "GROUP BY entity_id"
+        )
+        params = {'selectedCompany': company_name}
+        st.session_state.existingPersonell = db.query(sql, params)
+        st.session_state.lastQueriedCompanyPersonnel = company_name
+
     
     selected = []
     for person in st.session_state.existingPersonell:
         if st.checkbox(f'{person.entity_id} | {person.first_name} {person.last_name}', key=f'person_{person.entity_id}'):
             selected.append(person.entity_id)
     st.session_state.selectedExistingPeople = selected
-    st.session_state.existingPersonell = None
 
 def AddNewPersonell() -> None:
     st.session_state.newPersonell.append({
@@ -87,6 +90,7 @@ def AddNewCompany() -> None:
     db.execute(sql, params)
     st.session_state.selectedCompany = f'{company_id} | {st.session_state.newCompany}'
     st.session_state.newCompany = ''
+    st.session_state.lastQueriedCompanyPersonnel = ''
     st.session_state.Mode = StreamlitMode.NameInputStandard
 
 def ShowNewCompany() -> None:
@@ -152,19 +156,22 @@ def SetUpStateVariables() -> None:
     if 'PreviousMode' not in st.session_state:
         st.session_state.PreviousMode = StreamlitMode.NameInputStandard
     if 'existingPersonell' not in st.session_state:
-        st.session_state.existingPersonell = None
+        st.session_state.existingPersonell = []
     if 'selectedExistingPeople' not in st.session_state:
         st.session_state.selectedExistingPeople = None
     if 'newPersonell' not in st.session_state:
         st.session_state.newPersonell = []
     if 'newCompanyPersonell' not in st.session_state:
         st.session_state.newCompanyPersonell = []
+    if 'lastQueriedCompanyPersonnel' not in st.session_state:
+        st.session_state.lastQueriedCompanyPersonnel = ''
 
 def ResetStateVariables() -> None:
-    st.session_state.existingPersonell = None
+    st.session_state.existingPersonell = []
     st.session_state.selectedExistingPeople = None
     st.session_state.newPersonell = []
     st.session_state.newCompanyPersonell = []
+    st.session_state.lastQueriedCompanyPersonnel = ''
 
 db = _get_database()
 # First, set up all state variable, including modes
