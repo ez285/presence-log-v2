@@ -146,6 +146,10 @@ def Submit() -> None:
     for personID in st.session_state.selectedExistingPeople:
         params = {'date': st.session_state.selectedDate.isoformat(), 'personID': str(personID)}
         db.execute(sql, params)
+    
+    for var in st.session_state.keys():
+        if isinstance(var, str) and var.startswith('person_'):
+            st.session_state[var] = False
 
 def ShowSubmitButton() -> None:
     st.button('Submit', on_click=Submit)
