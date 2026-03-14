@@ -19,7 +19,7 @@ class StreamlitMode:
 
 def ShowDate() -> None:
     st.session_state.setdefault('selectedDate', date.today())
-    left, right = st.columns([8, 1], vertical_alignment='bottom')
+    left, right = st.columns([4, 1], vertical_alignment='bottom')
     with left:
         st.date_input('Date', label_visibility='visible', format='DD/MM/YYYY', key='selectedDate')
     with right:
@@ -169,7 +169,7 @@ def ShowAll() -> None:
                     "entity_id AS \"Person ID\", "
                     "MAX(CASE WHEN property_name = 'First Name' THEN property_value END) AS \"First Name\", "
                     "MAX(CASE WHEN property_name = 'Last Name' THEN property_value END) AS \"Last Name\", "
-                    "MAX(CASE WHEN property_name = 'Company' THEN property_value END) AS \"Company\", "
+                    "MAX(CASE WHEN property_name = 'Company' THEN property_value::INTEGER END) AS \"Company\", "
                     "MAX(CASE WHEN property_name = 'Position' THEN property_value END) AS \"Position\", "
                     "MAX(CASE WHEN property_name = 'Signed H&S' THEN property_value END) AS \"Signed H&S\", "
                     "MAX(CASE WHEN property_name = 'Documented' THEN property_value END) AS \"Documented\" "
