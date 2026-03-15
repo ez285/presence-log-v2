@@ -155,7 +155,8 @@ def Submit() -> None:
     for var in st.session_state.keys():
         if isinstance(var, str) and var.startswith('person_'):
             st.session_state[var] = False
-    
+
+    ResetStateVariables()
     _get_personnel_for_company.clear()
 
 def ShowAll() -> None:
