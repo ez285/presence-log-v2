@@ -69,6 +69,8 @@ def ShowExistingPersonell() -> None:
     st.session_state.selectedExistingPeople = selected
 
 def AddNewPersonell() -> None:
+    if st.st.session_state.firstName == '' and st.session_state.lastName == '':
+        return
     st.session_state.newPersonell.append({
         'First Name': st.session_state.firstName,
         'Last Name':st.session_state.lastName
