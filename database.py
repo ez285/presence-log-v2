@@ -35,7 +35,7 @@ class Database:
             DB_HOST = st.secrets.Database['DB_HOST']
             DB_PORT = st.secrets.Database['DB_PORT']
             DB_NAME = st.secrets.Database['DB_NAME']
-            DB_URL = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+            DB_URL = f'postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
             cls._engine = create_engine(DB_URL, pool_size=5, max_overflow=10, pool_recycle=3600)
         return cls._engine
 
